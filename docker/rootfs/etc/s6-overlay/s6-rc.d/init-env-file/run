@@ -1,0 +1,26 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash
+
+echo "[env-init] Checking for environment from files"
+
+if find /run/s6/container_environment/*"_FILE" -maxdepth 1 > /dev/null 2>&1; then
+	for FILENAME in /run/s6/container_environment/*; do
+		if [[ "${FILENAME##*/}" == PAPERLESS_*_FILE ]]; then
+			# This should have been named different..
+			if [[ ${env_name} == "PAPERLESS_OCR_SKIP_ARCHIVE_FILE" ]]; then
+				continue
+			fi
+			SECRETFILE=$(cat "${FILENAME}")
+			# Check the file exists
+			if [[ -f ${SECRETFILE} ]]; then
+				# Trim off trailing _FILE
+				FILESTRIP=${FILENAME//_FILE/}
+				# Set environment variable
+				cat "${SECRETFILE}" > "${FILESTRIP}"
+				echo "[env-init] ${FILESTRIP##*/} set from ${FILENAME##*/}"
+			else
+				echo "[env-init] cannot find secret in ${FILENAME##*/}"
+			fi
+		fi
+	done
+fi

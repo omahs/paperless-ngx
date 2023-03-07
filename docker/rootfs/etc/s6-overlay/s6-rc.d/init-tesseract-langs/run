@@ -1,0 +1,44 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash
+
+install_languages() {
+	echo "Installing languages..."
+
+	read -ra langs <<<"$1"
+
+	# Check that it is not empty
+	if [ ${#langs[@]} -eq 0 ]; then
+		return
+	fi
+	apt-get update
+
+	for lang in "${langs[@]}"; do
+		pkg="tesseract-ocr-$lang"
+
+		if dpkg -s "$pkg" &>/dev/null; then
+			echo "Package $pkg already installed!"
+			continue
+		fi
+
+		if ! apt-cache show "$pkg" &>/dev/null; then
+			echo "Package $pkg not found! :("
+			continue
+		fi
+
+		echo "Installing package $pkg..."
+		if ! apt-get -y install "$pkg" &>/dev/null; then
+			echo "Could not install $pkg"
+			exit 1
+		fi
+	done
+}
+
+echo "Checking if additional teseract languages needed"
+
+# Install additional languages if specified
+if [[ -n "$PAPERLESS_OCR_LANGUAGES" ]]; then
+	install_languages "$PAPERLESS_OCR_LANGUAGES"
+	echo "Additional packages installed"
+else
+	echo "No additional installs requested"
+fi

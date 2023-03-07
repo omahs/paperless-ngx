@@ -1,0 +1,30 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash
+
+declare -r export_dir="/usr/src/paperless/export"
+declare -r data_dir="${PAPERLESS_DATA_DIR:-/usr/src/paperless/data}"
+declare -r media_root_dir="${PAPERLESS_MEDIA_ROOT:-/usr/src/paperless/media}"
+declare -r consume_dir="${PAPERLESS_CONSUMPTION_DIR:-/usr/src/paperless/consume}"
+declare -r tmp_dir="/tmp/paperless"
+
+for dir in \
+	"${export_dir}" \
+	"${data_dir}" "${data_dir}/index" \
+	"${media_root_dir}" "${media_root_dir}/documents" "${media_root_dir}/documents/originals" "${media_root_dir}/documents/thumbnails" \
+	"${consume_dir}" \
+	"${tmp_dir}"; do
+	if [[ ! -d "${dir}" ]]; then
+		echo "Creating directory ${dir}"
+		mkdir "${dir}"
+	fi
+done
+
+echo "Adjusting file and folder permissions"
+chown -R paperless:paperless "${tmp_dir}"
+	for dir in \
+		"${export_dir}" \
+		"${data_dir}" \
+		"${media_root_dir}" \
+		"${consume_dir}"; do
+		find "${dir}" -not \( -user paperless -and -group paperless \) -exec chown paperless:paperless {} +
+	done

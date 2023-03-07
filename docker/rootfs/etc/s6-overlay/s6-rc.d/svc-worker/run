@@ -1,0 +1,6 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash
+
+cd ${PAPERLESS_SRC_DIR}
+
+exec s6-setuidgid paperless /usr/local/bin/celery --app paperless worker --loglevel INFO

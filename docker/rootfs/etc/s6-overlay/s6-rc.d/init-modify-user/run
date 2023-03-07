@@ -1,0 +1,20 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash
+
+declare -r usermap_original_uid=$(id -u paperless)
+declare -r usermap_original_gid=$(id -g paperless)
+declare -r usermap_new_uid=${USERMAP_UID:-$usermap_original_uid}
+declare -r usermap_new_gid=${USERMAP_GID:-${usermap_original_gid:-$usermap_new_uid}}
+
+if [[ ${usermap_new_uid} != "${usermap_original_uid}" || ${usermap_new_gid} != "${usermap_original_gid}" ]]; then
+	echo "Mapping UID and GID for paperless:paperless to $usermap_new_uid:$usermap_new_gid"
+	usermod -o -u "${usermap_new_uid}" paperless
+	groupmod -o -g "${usermap_new_gid}" paperless
+fi
+
+echo "───────────────────────────────────────"
+echo "GID/UID"
+echo "───────────────────────────────────────"
+echo "User UID:    $(id -u paperless)"
+echo "User GID:    $(id -g paperless)"
+echo "───────────────────────────────────────"
