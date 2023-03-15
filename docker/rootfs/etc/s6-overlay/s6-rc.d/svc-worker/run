@@ -3,4 +3,4 @@
 
 cd ${PAPERLESS_SRC_DIR}
 
-exec s6-setuidgid paperless /usr/local/bin/celery --app paperless worker --loglevel INFO
+exec s6-setuidgid paperless /usr/local/bin/celery --app paperless worker --loglevel INFO --without-mingle --without-gossip
