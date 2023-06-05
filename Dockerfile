@@ -43,14 +43,8 @@ WORKDIR /usr/src/s6
 
 # https://github.com/just-containers/s6-overlay#customizing-s6-overlay-behaviour
 ENV \
-    LANG="C.UTF-8" \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_PREFER_BINARY=1 \
-    PIP_FIND_LINKS="https://wheel-index.linuxserver.io/ubuntu/" \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
-    S6_CMD_WAIT_FOR_SERVICES=1 \
     S6_VERBOSITY=1
 
 # Buildx provided, must be defined to use though
@@ -96,7 +90,7 @@ RUN set -eux \
       && rm -rf /var/lib/apt/lists/*
 
 # Copy our definitions
-COPY --link ./docker/rootfs /
+#COPY ./docker/rootfs /
 
 # Stage: main-app
 # Purpose: The final image
@@ -248,7 +242,7 @@ RUN --mount=type=cache,target=/root/.cache/pip/,id=pip-cache \
   && echo "Installing build system packages" \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
-    && python3 -m pip install --no-cache-dir --upgrade wheel \
+    && python3 -m pip install --upgrade wheel \
   && echo "Installing Python requirements" \
     && python3 -m pip install --default-timeout=1000 --requirement requirements.txt \
   && echo "Patching whitenoise for compression speedup" \
@@ -300,3 +294,6 @@ VOLUME ["/usr/src/paperless/data", \
 ENTRYPOINT ["/init"]
 
 EXPOSE 8000
+
+# Copy our definitions
+COPY ./docker/rootfs /

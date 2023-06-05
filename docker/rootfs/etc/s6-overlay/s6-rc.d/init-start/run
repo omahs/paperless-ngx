@@ -6,3 +6,4 @@ echo "paperless-ngx docker container starting..."
 # Set some directories into environment for other steps to access via environment
 # Sort of like variables for later
 printf "/usr/src/paperless/src" > /var/run/s6/container_environment/PAPERLESS_SRC_DIR
+echo $(date +%s) > /var/run/s6/container_environment/PAPERLESS_START_TIME_S

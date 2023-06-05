@@ -12,5 +12,6 @@ if [[ -n "${PAPERLESS_ENABLE_FLOWER}" ]]; then
 	exec s6-setuidgid paperless /usr/local/bin/celery --app paperless flower --conf=${PAPERLESS_SRC_DIR}/paperless/flowerconfig.py
 else
 	echo "Not starting flower"
+	# https://skarnet.org/software/s6/s6-svc.html
 	exec s6-svc -Od .
 fi
