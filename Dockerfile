@@ -37,7 +37,7 @@ RUN set -eux \
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
 #  - Don't leave anything extra in here either
-FROM python:3.9-slim-bullseye as s6-overlay-base
+FROM docker.io/python:3.9-slim-bookworm as s6-overlay-base
 
 WORKDIR /usr/src/s6
 
@@ -54,8 +54,8 @@ ARG TARGETVARIANT
 ARG S6_OVERLAY_VERSION=3.1.5.0
 
 # Lock these are well to prevent rebuilds as much as possible
-ARG S6_BUILD_TIME_PKGS="curl=7.74.0-1.3+deb11u7\
-                        xz-utils=5.2.5-2.1~deb11u1"
+ARG S6_BUILD_TIME_PKGS="curl=7.88.1-10+deb12u1\
+                        xz-utils=5.4.1-0.2"
 
 RUN set -eux \
     && echo "Installing build time packages" \
@@ -64,8 +64,7 @@ RUN set -eux \
     && echo "Determining arch" \
       && S6_ARCH="" \
       && if [ "${TARGETARCH}${TARGETVARIANT}" = "amd64" ]; then S6_ARCH="x86_64"; \
-      elif [ "${TARGETARCH}${TARGETVARIANT}" = "arm64" ]; then S6_ARCH="aarch64"; \
-      elif [ "${TARGETARCH}${TARGETVARIANT}" = "armv7" ]; then S6_ARCH="armhf"; fi \
+      elif [ "${TARGETARCH}${TARGETVARIANT}" = "arm64" ]; then S6_ARCH="aarch64"; fi\
       && if [ -z "${S6_ARCH}" ]; then { echo "Error: Not able to determine arch"; exit 1; }; fi \
     && echo "Installing s6-overlay for ${S6_ARCH}" \
       && curl --fail --silent --show-error -L --output s6-overlay-noarch.tar.xz --location \
@@ -90,7 +89,7 @@ RUN set -eux \
       && rm -rf /var/lib/apt/lists/*
 
 # Copy our definitions
-#COPY ./docker/rootfs /
+COPY ./docker/rootfs /
 
 # Stage: main-app
 # Purpose: The final image
@@ -199,22 +198,15 @@ COPY gunicorn.conf.py .
 
 # setup docker-specific things
 # These change sometimes, but rarely
-WORKDIR /usr/src/paperless/src/docker/
+WORKDIR /usr/src/paperless/docker/
 
 COPY [ \
-  "docker/imagemagick-policy.xml", \
-  "docker/wait-for-redis.py", \
   "docker/management_script.sh", \
   "docker/install_management_commands.sh", \
-  "/usr/src/paperless/src/docker/" \
+  "/usr/src/paperless/docker/" \
 ]
 
 RUN set -eux \
-  && echo "Configuring ImageMagick" \
-    && mv imagemagick-policy.xml /etc/ImageMagick-6/policy.xml \
-  && echo "Setting up Docker scripts" \
-    && mv wait-for-redis.py /sbin/wait-for-redis.py \
-    && chmod 755 /sbin/wait-for-redis.py \
   && echo "Installing managment commands" \
     && chmod +x install_management_commands.sh \
     && ./install_management_commands.sh
@@ -294,6 +286,3 @@ VOLUME ["/usr/src/paperless/data", \
 ENTRYPOINT ["/init"]
 
 EXPOSE 8000
-
-# Copy our definitions
-COPY ./docker/rootfs /

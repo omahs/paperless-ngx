@@ -13,11 +13,12 @@ show-fixes = true
 
 [per-file-ignores]
 ".github/scripts/*.py" = ["E501", "INP001", "SIM117"]
-"docker/wait-for-redis.py" = ["INP001"]
+"docker/rootfs/usr/local/sbin/wait-for-redis.py" = ["INP001"]
 "*/tests/*.py" = ["E501", "SIM117"]
 "*/migrations/*.py" = ["E501", "SIM"]
 "src/paperless_tesseract/tests/test_parser.py" = ["RUF001"]
 "src/documents/models.py" = ["SIM115"]
+
 
 [isort]
 force-single-line = true
