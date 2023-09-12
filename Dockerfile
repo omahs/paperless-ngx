@@ -88,7 +88,7 @@ RUN set -eux \
       && apt-get -y autoremove --purge \
       && rm -rf /var/lib/apt/lists/*
 
-# Copy our definitions
+# Copy our service defs and filesystem
 COPY ./docker/rootfs /
 
 # Stage: main-app
