@@ -37,7 +37,7 @@ RUN set -eux \
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
 #  - Don't leave anything extra in here either
-FROM docker.io/python:3.9-slim-bookworm as s6-overlay-base
+FROM docker.io/python:3.11-slim-bookworm as s6-overlay-base
 
 WORKDIR /usr/src/s6
 
@@ -86,7 +86,8 @@ RUN set -eux \
     && echo "Cleaning up image" \
       && apt-get -y purge ${S6_BUILD_TIME_PKGS} \
       && apt-get -y autoremove --purge \
-      && rm -rf /var/lib/apt/lists/*
+      && rm -rf /var/lib/apt/lists/* \
+      && ls -ahl /
 
 # Copy our service defs and filesystem
 COPY ./docker/rootfs /
@@ -95,7 +96,7 @@ COPY ./docker/rootfs /
 # Purpose: The final image
 # Comments:
 #  - Don't leave anything extra in here
-FROM docker.io/python:3.11-slim-bookworm as main-app
+FROM s6-overlay-base as main-app
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
