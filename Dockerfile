@@ -45,7 +45,8 @@ WORKDIR /usr/src/s6
 ENV \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
-    S6_VERBOSITY=1
+    S6_VERBOSITY=1 \
+    PATH=/command:$PATH
 
 # Buildx provided, must be defined to use though
 ARG TARGETARCH

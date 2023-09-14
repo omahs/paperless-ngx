@@ -1,4 +1,4 @@
-#!/command/with-contenv bash
+#!/command/with-contenv /usr/bin/bash
 # shellcheck shell=bash
 
 set -e
