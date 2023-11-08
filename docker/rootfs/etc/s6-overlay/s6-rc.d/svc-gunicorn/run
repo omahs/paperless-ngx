@@ -3,4 +3,9 @@
 
 cd ${PAPERLESS_SRC_DIR}
 
-exec s6-setuidgid paperless /usr/local/bin/gunicorn -c /usr/src/paperless/gunicorn.conf.py paperless.asgi:application
+gosu_cmd=(s6-setuidgid paperless)
+if [ -n ${USER_IS_NON_ROOT} ]; then
+	gosu_cmd=()
+fi
+
+exec ${gosu_cmd[@]} /usr/local/bin/gunicorn -c /usr/src/paperless/gunicorn.conf.py paperless.asgi:application

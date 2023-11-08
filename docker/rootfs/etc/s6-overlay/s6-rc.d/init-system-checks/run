@@ -5,4 +5,10 @@
 echo "Running Django checks"
 
 cd "${PAPERLESS_SRC_DIR}"
-s6-setuidgid paperless python3 manage.py check
+
+gosu_cmd=(s6-setuidgid paperless)
+if [ -n ${USER_IS_NON_ROOT} ]; then
+	gosu_cmd=()
+fi
+
+${gosu_cmd[@]} python3 manage.py check

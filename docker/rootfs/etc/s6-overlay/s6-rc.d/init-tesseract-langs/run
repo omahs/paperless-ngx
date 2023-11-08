@@ -10,10 +10,18 @@ install_languages() {
 	if [ ${#langs[@]} -eq 0 ]; then
 		return
 	fi
-	apt-get update
+
+	if [ ! -n ${USER_IS_NON_ROOT} ]; then
+		apt-get update
+	fi
 
 	for lang in "${langs[@]}"; do
 		pkg="tesseract-ocr-$lang"
+
+		if [ -n ${USER_IS_NON_ROOT} ]; then
+			echo "ERROR: Unable to install language ${pkg} as non-root, startup may fail"
+			continue
+		fi
 
 		if dpkg -s "$pkg" &>/dev/null; then
 			echo "Package $pkg already installed!"
@@ -37,6 +45,7 @@ echo "Checking if additional teseract languages needed"
 
 # Install additional languages if specified
 if [[ -n "$PAPERLESS_OCR_LANGUAGES" ]]; then
+
 	install_languages "$PAPERLESS_OCR_LANGUAGES"
 	echo "Additional packages installed"
 else

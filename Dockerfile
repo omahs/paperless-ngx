@@ -52,11 +52,11 @@ ENV \
 ARG TARGETARCH
 ARG TARGETVARIANT
 # Lock this version
-ARG S6_OVERLAY_VERSION=3.1.5.0
+ARG S6_OVERLAY_VERSION=3.1.6.0
 
 # Lock these are well to prevent rebuilds as much as possible
-ARG S6_BUILD_TIME_PKGS="curl=7.88.1-10+deb12u1\
-                        xz-utils=5.4.1-0.2"
+ARG S6_BUILD_TIME_PKGS="curl \
+                        xz-utils"
 
 RUN set -eux \
     && echo "Installing build time packages" \
@@ -87,11 +87,10 @@ RUN set -eux \
     && echo "Cleaning up image" \
       && apt-get -y purge ${S6_BUILD_TIME_PKGS} \
       && apt-get -y autoremove --purge \
-      && rm -rf /var/lib/apt/lists/* \
-      && ls -ahl /
+      && rm -rf /var/lib/apt/lists/*
 
 # Copy our service defs and filesystem
-COPY ./docker/rootfs /
+#COPY ./docker/rootfs /
 
 # Stage: main-app
 # Purpose: The final image
@@ -188,21 +187,19 @@ RUN set -eux \
         && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
       && echo "Cleaning up image layer" \
         && rm --force --verbose *.deb \
-    && rm --recursive --force --verbose /var/lib/apt/lists/* \
-  && echo "Installing supervisor" \
-    && python3 -m pip install --default-timeout=1000 --upgrade --no-cache-dir supervisor==4.2.5
+    && rm --recursive --force --verbose /var/lib/apt/lists/*
 
 # Copy gunicorn config
 # Changes very infrequently
 WORKDIR /usr/src/paperless/
 
-COPY gunicorn.conf.py .
+COPY --chown=1000:1000 gunicorn.conf.py /usr/src/paperless/gunicorn.conf.py
 
 # setup docker-specific things
 # These change sometimes, but rarely
 WORKDIR /usr/src/paperless/docker/
 
-COPY [ \
+COPY --chown=1000:1000 [ \
   "docker/management_script.sh", \
   "docker/install_management_commands.sh", \
   "/usr/src/paperless/docker/" \
@@ -217,7 +214,7 @@ WORKDIR /usr/src/paperless/src/
 
 # Python dependencies
 # Change pretty frequently
-COPY --from=pipenv-base /usr/src/pipenv/requirements.txt ./
+COPY --chown=1000:1000 --from=pipenv-base /usr/src/pipenv/requirements.txt ./
 
 # Packages needed only for building a few quick Python
 # dependencies
@@ -288,3 +285,5 @@ VOLUME ["/usr/src/paperless/data", \
 ENTRYPOINT ["/init"]
 
 EXPOSE 8000
+
+COPY ./docker/rootfs /

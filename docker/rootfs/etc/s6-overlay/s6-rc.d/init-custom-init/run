@@ -28,7 +28,7 @@ if [ -d "${custom_script_dir}" ]; then
 			NAME="$(basename "${SCRIPT}")"
 			if [ -f "${SCRIPT}" ]; then
 				echo "[custom-init] ${NAME}: executing..."
-				/bin/bash "${SCRIPT}"
+				/command/with-contenv /bin/bash "${SCRIPT}"
 				echo "[custom-init] ${NAME}: exited $?"
 			elif [ ! -f "${SCRIPT}" ]; then
 				echo "[custom-init] ${NAME}: is not a file"

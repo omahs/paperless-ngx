@@ -8,8 +8,13 @@ if [[ -n "${PAPERLESS_ENABLE_FLOWER}" ]]; then
 	echo "Starting flower in 5s"
 	sleep 5
 	cd ${PAPERLESS_SRC_DIR}
+	gosu_cmd=(s6-setuidgid paperless)
+	if [ -n ${USER_IS_NON_ROOT} ]; then
+		gosu_cmd=()
+	fi
 
-	exec s6-setuidgid paperless /usr/local/bin/celery --app paperless flower --conf=${PAPERLESS_SRC_DIR}/paperless/flowerconfig.py
+	exec ${gosu_cmd[@]} /usr/local/bin/celery --app paperless flower --conf=${PAPERLESS_SRC_DIR}/paperless/flowerconfig.py
+
 else
 	echo "Not starting flower"
 	# https://skarnet.org/software/s6/s6-svc.html

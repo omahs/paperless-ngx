@@ -3,4 +3,9 @@
 
 cd ${PAPERLESS_SRC_DIR}
 
-exec s6-setuidgid paperless /usr/local/bin/celery --app paperless beat --loglevel INFO
+gosu_cmd=(s6-setuidgid paperless)
+if [ -n ${USER_IS_NON_ROOT} ]; then
+	gosu_cmd=()
+fi
+
+exec ${gosu_cmd[@]} /usr/local/bin/celery --app paperless beat --loglevel INFO
