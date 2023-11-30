@@ -75,7 +75,8 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "ng2-pdf-viewer"
+              "pdfjs-dist",
+              "pdfjs-dist/web/pdf_viewer"
             ],
             "vendorChunk": true,
             "extractLicenses": false,
