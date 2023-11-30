@@ -231,26 +231,7 @@ export class PdfViewerComponent
     private element: ElementRef<HTMLElement>,
     private ngZone: NgZone
   ) {
-    let pdfWorkerSrc: string
-
-    const pdfJsVersion: string = (PDFJS as any).version
-    const versionSpecificPdfWorkerUrl: string = (window as any)[
-      `pdfWorkerSrc${pdfJsVersion}`
-    ]
-
-    if (versionSpecificPdfWorkerUrl) {
-      pdfWorkerSrc = versionSpecificPdfWorkerUrl
-    } else if (
-      window.hasOwnProperty('pdfWorkerSrc') &&
-      typeof (window as any).pdfWorkerSrc === 'string' &&
-      (window as any).pdfWorkerSrc
-    ) {
-      pdfWorkerSrc = (window as any).pdfWorkerSrc
-    } else {
-      pdfWorkerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfJsVersion}/legacy/build/pdf.worker.min.js`
-    }
-
-    PDFJS.GlobalWorkerOptions['workerSrc'] = pdfWorkerSrc
+    PDFJS.GlobalWorkerOptions['workerSrc'] = '/assets/js/pdf.worker.min.js'
   }
 
   ngAfterViewChecked(): void {
